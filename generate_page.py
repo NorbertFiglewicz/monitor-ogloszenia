@@ -13,7 +13,7 @@ html_content = f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Monitoring ogłoszeń</title>
+<title>Monitoring</title>
 <style>
 body {{
     font-family: Arial;
@@ -67,3 +67,4 @@ html_content += """
 # Zapisz do pliku
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(html_content)
+
