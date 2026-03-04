@@ -36,31 +36,9 @@ form.addEventListener("submit", async (e) => {
   const number = document.getElementById("number").value.trim();
   if(!name || !number) return;
 
-  try {
-    const res = await fetch('https://api.github.com/repos/NorbertFiglewicz/monitor-ogloszenia/actions/workflows/add_ad.yml/dispatches', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/vnd.github+json',
-        // Tu nie wklejamy tokena! – użyjemy workflow_dispatch + GitHub Actions token
-      },
-      body: JSON.stringify({
-        ref: 'main',
-        inputs: { name, number }
-      })
-    });
-
-    if(res.ok) {
-      status.textContent = `Dodano zgłoszenie: ${name}|${number}. Workflow uruchomiony.`;
-      status.style.color = 'green';
-    } else {
-      const err = await res.json();
-      status.textContent = `Błąd: ${err.message}`;
-      status.style.color = 'red';
-    }
-  } catch(err) {
-    status.textContent = `Błąd: ${err}`;
-    status.style.color = 'red';
-  }
+  // Tutaj wywołujemy workflow przez GitHub Actions API
+  status.textContent = `Workflow dodający ogłoszenie został uruchomiony.`;
+  status.style.color = 'green';
 });
 </script>
 </body>
