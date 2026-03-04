@@ -2,7 +2,7 @@ name: Monitor ogłoszeń
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/5 * * * *"   # co 5 minut
   workflow_dispatch:
 
 permissions:
@@ -13,32 +13,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1️⃣ Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      # 2️⃣ Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # 3️⃣ Instalacja bibliotek
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install requests pandas matplotlib
 
-      - name: Odtwórz ads.secret.txt z base64
+      # 4️⃣ Odtworzenie pliku z Secret (base64)
+      - name: Odtwórz ads.secret.txt
         run: |
           echo "${{ secrets.ADS_SECRET }}" | base64 --decode > ads.secret.txt
 
+      # 5️⃣ Sprawdzenie czy plik się utworzył
+      - name: Debug ads.secret.txt
+        run: |
+          echo "Zawartość ads.secret.txt:"
+          cat ads.secret.txt || echo "Plik nie istnieje"
+
+      # 6️⃣ Sprawdzenie ogłoszeń
       - name: Sprawdź ogłoszenia
         run: python check_ads.py
 
+      # 7️⃣ Generowanie wykresów
       - name: Generuj wykresy
         run: python generate_chart.py
 
+      # 8️⃣ Generowanie strony
       - name: Generuj stronę
         run: python generate_page.py
 
+      # 9️⃣ Commit tylko jeśli są zmiany
       - name: Commit i push
         run: |
           git config --global user.name "monitor-bot"
           git config --global user.email "monitor@github.com"
-          git add *.csv *.png index.html
-          git commit -m "Aktualizacja monitoringu" || exit 0
-          git push
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "Brak zmian do commitowania"
+          else
+            git commit -m "Automatyczna aktualizacja monitoringu"
+            git push
+          fi
