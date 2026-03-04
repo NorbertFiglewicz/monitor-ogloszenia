@@ -16,17 +16,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Prepare ads.json
+      - name: Dodaj ogłoszenie do JSON
         run: |
+          # jeśli plik nie istnieje, tworzymy pusty JSON
           if [ ! -f ads.json ]; then
-            echo "" > ads.json
+            echo "[]" > ads.json
           fi
+          
+          # dodajemy nowe ogłoszenie do JSON
+          jq --arg name "${{ github.event.inputs.name }}" \
+             --arg number "${{ github.event.inputs.number }}" \
+             '. += [{"name": $name, "number": $number}]' ads.json > tmp.json
+          mv tmp.json ads.json
 
-      - name: Add new ad
-        run: |
-          echo "${{ github.event.inputs.name }}|${{ github.event.inputs.number }}" >> ads.json
-
-      - name: Commit and push changes
+      - name: Commit i push
         run: |
           git config --global user.name "monitor-bot"
           git config --global user.email "monitor@github.com"
