@@ -58,10 +58,5 @@ jobs:
           git config --global user.email "monitor@github.com"
 
           git add .
-
-          if git diff --cached --quiet; then
-            echo "Brak zmian do commitowania"
-          else
-            git commit -m "Automatyczna aktualizacja monitoringu"
-            git push
-          fi
+          git commit -m "Automatyczna aktualizacja monitoringu" || echo "Brak zmian do commitowania"
+          git push
