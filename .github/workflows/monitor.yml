@@ -9,39 +9,31 @@ jobs:
   monitor:
     runs-on: ubuntu-latest
     steps:
-      # 1️⃣ Pobranie repo
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2️⃣ Ustawienie sekretów w środowisku
       - name: Ustawienie secretów
         run: |
           echo "BASE_ANONS=${{ secrets.BASE_ANONS }}" >> $GITHUB_ENV
           echo "BASE_MAIN=${{ secrets.BASE_MAIN }}" >> $GITHUB_ENV
 
-      # 3️⃣ Instalacja Pythona
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      # 4️⃣ Instalacja zależności
       - name: Install dependencies
         run: pip install requests pandas matplotlib
 
-      # 5️⃣ Sprawdzenie statusów ogłoszeń
       - name: Check ads
         run: python check_ads.py
 
-      # 6️⃣ Generowanie wykresów
       - name: Generate charts
         run: python generate_chart.py
 
-      # 7️⃣ Generowanie strony index.html
       - name: Generate index.html
         run: python generate_page.py
 
-      # 8️⃣ Commit i push z GITHUB_TOKEN
       - name: Commit i push
         run: |
           git config --global user.name "monitor-bot"
