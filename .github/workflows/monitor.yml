@@ -2,27 +2,29 @@ name: Monitor ogłoszeń (bez ujawniania URL)
 
 on:
   schedule:
-    - cron: "0 * * * *"
-  workflow_dispatch:
+    - cron: "0 * * * *"   # co godzinę
+  workflow_dispatch:       # ręczne uruchomienie
 
 permissions:
-  contents: write
+  contents: write          # do commitowania plików
 
 jobs:
   monitor:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Pobranie repo publicznego
+      # 1️⃣ Pobranie repozytorium
       - uses: actions/checkout@v4
 
-      # 2️⃣ Setup Python
+      # 2️⃣ Setup Pythona
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       # 3️⃣ Instalacja bibliotek
-      - run: pip install -r requirements.txt
+      - name: Install Python packages
+        run: |
+          pip install -r requirements.txt
 
       # 4️⃣ Utworzenie prywatnego ads.json z GitHub Secret
       - name: Tworzenie ads.json z Secret
@@ -33,7 +35,7 @@ jobs:
       - name: Sprawdź status ogłoszeń
         run: |
           DATE=$(date "+%Y-%m-%d %H:00")
-          python <<EOF
+          python - << 'EOF'
 import json
 import requests
 from datetime import datetime
@@ -50,8 +52,8 @@ for ad in ads:
     except:
         status = "NIEDOSTEPNE"
 
-    # plik log bez ujawniania URL
     filename = f"log_{ad['name'].replace(' ','_')}.csv"
+
     with open(filename, "a") as log:
         log.write(f"{DATE},{status}\n")
 EOF
@@ -64,7 +66,7 @@ EOF
       - name: Generuj stronę WWW
         run: python generate_page.py
 
-      # 8️⃣ Commit i push
+      # 8️⃣ Commit i push zmian
       - name: Commit i push
         run: |
           git config --global user.name "monitor-bot"
