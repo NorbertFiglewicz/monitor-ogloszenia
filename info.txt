@@ -1,0 +1,12 @@
+https://twoj-login.github.io/monitor-ogloszenia/
+
+ak uruchomić stronę WWW
+
+1️⃣ Wgraj wszystko na nowe repo na GitHub
+2️⃣ Wejdź w:
+
+Settings → Pages
+Source → Deploy from branch
+Branch → main
+
+Po chwili dostaniesz adres typu:
