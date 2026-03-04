@@ -1,8 +1,8 @@
-name: Monitor ogłoszeń (bez ujawniania URL)
+name: Monitor ogłoszeń
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -19,21 +19,20 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Python packages
-        run: |
-          pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: Tworzenie ads.json z Secret
+      - name: Odtwórz ads.secret.txt z base64
         run: |
-          echo "${{ secrets.ADS_JSON }}" > ads.json
+          echo "${{ secrets.ADS_SECRET }}" | base64 --decode > ads.secret.txt
 
-      - name: Sprawdź status ogłoszeń
+      - name: Sprawdź ogłoszenia
         run: python check_ads.py
 
       - name: Generuj wykresy
         run: python generate_chart.py
 
-      - name: Generuj stronę WWW
+      - name: Generuj stronę
         run: python generate_page.py
 
       - name: Commit i push
@@ -41,5 +40,5 @@ jobs:
           git config --global user.name "monitor-bot"
           git config --global user.email "monitor@github.com"
           git add *.csv *.png index.html
-          git commit -m "Aktualizacja statusu ogłoszeń" || exit 0
+          git commit -m "Aktualizacja monitoringu" || exit 0
           git push
