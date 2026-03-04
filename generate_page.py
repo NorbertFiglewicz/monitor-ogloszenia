@@ -1,31 +1,33 @@
-import json
+# generate_page.py
+
+import glob
 import pandas as pd
 import os
 
-with open("ads.json") as f:
-    ads = json.load(f)
-
 sections = ""
 
-for ad in ads:
-    name = ad["name"]
-    filename = f"log_{name.replace(' ','_')}.csv"
-    chart_name = f"chart_{name.replace(' ','_')}.png"
+log_files = glob.glob("log_*.csv")
 
-    if not os.path.exists(filename):
-        continue
+for file in log_files:
+    name = file.replace("log_", "").replace(".csv", "")
+    df = pd.read_csv(file, names=["datetime","status"])
 
-    df = pd.read_csv(filename, names=["datetime", "status"])
     last_status = df.iloc[-1]["status"]
 
-    color = "green" if last_status=="DOSTEPNE" else "red"
-    icon = "✅" if last_status=="DOSTEPNE" else "❌"
+    if last_status == "DOSTEPNE":
+        color = "green"
+        icon = "🟢"
+        text = "DOSTĘPNE"
+    else:
+        color = "red"
+        icon = "🔴"
+        text = "NIEDOSTĘPNE"
 
     sections += f"""
     <div class="card">
-        <h2>{name}</h2>
-        <div class="status" style="color:{color}">{icon} {last_status}</div>
-        <img src="{chart_name}" width="900">
+        <h2>{name.replace('_',' ')}</h2>
+        <div class="status" style="color:{color}">{icon} {text}</div>
+        <img src="chart_{name}.png" width="100%">
     </div>
     <hr>
     """
@@ -40,11 +42,12 @@ html = f"""
 body {{
     font-family: Arial;
     text-align: center;
-    margin: 50px;
+    margin: 30px;
 }}
 .status {{
-    font-size: 50px;
+    font-size: 40px;
     margin: 20px;
+    font-weight: bold;
 }}
 .card {{
     margin-bottom: 60px;
@@ -58,5 +61,5 @@ body {{
 </html>
 """
 
-with open("index.html", "w", encoding="utf-8") as f:
+with open("index.html","w",encoding="utf-8") as f:
     f.write(html)
