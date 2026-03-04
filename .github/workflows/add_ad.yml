@@ -1,0 +1,35 @@
+name: Add new ad
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Nazwa ogłoszenia'
+        required: true
+      number:
+        description: 'Numer ogłoszenia'
+        required: true
+
+jobs:
+  add_ad:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Prepare ads.json
+        run: |
+          if [ ! -f ads.json ]; then
+            echo "" > ads.json
+          fi
+
+      - name: Add new ad
+        run: |
+          echo "${{ github.event.inputs.name }}|${{ github.event.inputs.number }}" >> ads.json
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "monitor-bot"
+          git config --global user.email "monitor@github.com"
+          git add ads.json
+          git commit -m "Dodano ogłoszenie: ${{ github.event.inputs.name }}" || exit 0
+          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
