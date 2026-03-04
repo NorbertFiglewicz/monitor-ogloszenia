@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dodaj ogłoszenie</title>
+<style>
+body { font-family: Arial; margin: 30px; }
+label { display: block; margin-top: 10px; }
+input { width: 300px; padding: 5px; margin-top: 5px; }
+button { margin-top: 15px; padding: 10px 20px; }
+#status { margin-top: 20px; font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>Dodaj nowe ogłoszenie</h1>
+
+<form id="adForm">
+  <label>Nazwa ogłoszenia:</label>
+  <input type="text" id="name" placeholder="Router A(500)" required>
+  
+  <label>Numer ogłoszenia:</label>
+  <input type="text" id="number" placeholder="167304" required>
+  
+  <button type="submit">Dodaj do repo</button>
+</form>
+
+<p id="status"></p>
+
+<script>
+const form = document.getElementById("adForm");
+const status = document.getElementById("status");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("name").value.trim();
+  const number = document.getElementById("number").value.trim();
+  if(!name || !number) return;
+
+  try {
+    const res = await fetch('https://api.github.com/repos/NorbertFiglewicz/monitor-ogloszenia/actions/workflows/add_ad.yml/dispatches', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        // Tu nie wklejamy tokena! – użyjemy workflow_dispatch + GitHub Actions token
+      },
+      body: JSON.stringify({
+        ref: 'main',
+        inputs: { name, number }
+      })
+    });
+
+    if(res.ok) {
+      status.textContent = `Dodano zgłoszenie: ${name}|${number}. Workflow uruchomiony.`;
+      status.style.color = 'green';
+    } else {
+      const err = await res.json();
+      status.textContent = `Błąd: ${err.message}`;
+      status.style.color = 'red';
+    }
+  } catch(err) {
+    status.textContent = `Błąd: ${err}`;
+    status.style.color = 'red';
+  }
+});
+</script>
+</body>
+</html>
