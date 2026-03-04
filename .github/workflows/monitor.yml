@@ -2,71 +2,40 @@ name: Monitor ogłoszeń (bez ujawniania URL)
 
 on:
   schedule:
-    - cron: "0 * * * *"   # co godzinę
-  workflow_dispatch:       # ręczne uruchomienie
+    - cron: "0 * * * *"
+  workflow_dispatch:
 
 permissions:
-  contents: write          # do commitowania plików
+  contents: write
 
 jobs:
   monitor:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Pobranie repozytorium
       - uses: actions/checkout@v4
 
-      # 2️⃣ Setup Pythona
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # 3️⃣ Instalacja bibliotek
       - name: Install Python packages
         run: |
           pip install -r requirements.txt
 
-      # 4️⃣ Utworzenie prywatnego ads.json z GitHub Secret
       - name: Tworzenie ads.json z Secret
         run: |
           echo "${{ secrets.ADS_JSON }}" > ads.json
 
-      # 5️⃣ Sprawdzenie ogłoszeń
       - name: Sprawdź status ogłoszeń
-        run: |
-          DATE=$(date "+%Y-%m-%d %H:00")
-          python - << 'EOF'
-import json
-import requests
-from datetime import datetime
+        run: python check_ads.py
 
-DATE = datetime.now().strftime("%Y-%m-%d %H:00")
-
-with open("ads.json") as f:
-    ads = json.load(f)
-
-for ad in ads:
-    try:
-        r = requests.get(ad["url"], allow_redirects=True, timeout=10)
-        status = "DOSTEPNE" if r.url == ad["url"] else "NIEDOSTEPNE"
-    except:
-        status = "NIEDOSTEPNE"
-
-    filename = f"log_{ad['name'].replace(' ','_')}.csv"
-
-    with open(filename, "a") as log:
-        log.write(f"{DATE},{status}\n")
-EOF
-
-      # 6️⃣ Generowanie wykresów rocznych
       - name: Generuj wykresy
         run: python generate_chart.py
 
-      # 7️⃣ Generowanie strony WWW
       - name: Generuj stronę WWW
         run: python generate_page.py
 
-      # 8️⃣ Commit i push zmian
       - name: Commit i push
         run: |
           git config --global user.name "monitor-bot"
