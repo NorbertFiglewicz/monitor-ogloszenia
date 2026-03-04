@@ -28,10 +28,7 @@ jobs:
         run: |
           pip install requests pandas matplotlib
 
-      # 4️⃣ Odtworzenie pliku z Secret (base64)
-      - name: Odtwórz ads.secret.txt
-        run: |
-          echo "${{ secrets.ADS_SECRET }}" | base64 --decode > ads.secret.txt
+  
 
       # 5️⃣ Sprawdzenie czy plik się utworzył
       - name: Debug ads.secret.txt
