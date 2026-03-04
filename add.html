@@ -36,9 +36,25 @@ form.addEventListener("submit", async (e) => {
   const number = document.getElementById("number").value.trim();
   if(!name || !number) return;
 
-  // Tutaj wywołujemy workflow przez GitHub Actions API
-  status.textContent = `Workflow dodający ogłoszenie został uruchomiony.`;
-  status.style.color = 'green';
+  try {
+    const res = await fetch("http://localhost:3000/add-ad", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, number })
+    });
+
+    const data = await res.json();
+    if(res.ok){
+      status.textContent = data.message;
+      status.style.color = "green";
+    } else {
+      status.textContent = "Błąd: " + data.message;
+      status.style.color = "red";
+    }
+  } catch(err) {
+    status.textContent = "Błąd: " + err;
+    status.style.color = "red";
+  }
 });
 </script>
 </body>
