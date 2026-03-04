@@ -40,4 +40,4 @@ jobs:
           git config --global user.email "monitor@github.com"
           git add *.csv *.png index.html
           git commit -m "Automatyczna aktualizacja monitoringu" || echo "Brak zmian do commitowania"
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
