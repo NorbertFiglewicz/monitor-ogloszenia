@@ -1,46 +1,38 @@
-import pandas as pd
-from datetime import datetime
-import glob
+import glob, csv, datetime
 
-log_files = glob.glob("log_*.csv")
-last_update = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-html_content = f"""<!DOCTYPE html>
+html = """
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Monitoring LAN </title>
+<title>Monitoring ogłoszeń</title>
 <style>
-body {{ font-family: Arial; text-align: center; margin: 30px; }}
-.status {{ font-size: 40px; margin: 20px; font-weight: bold; }}
-.card {{ margin-bottom: 60px; }}
-.last-update {{ font-size: 16px; margin-top: 20px; color: #555; }}
+body { font-family: Arial; text-align: center; margin: 30px; }
+.status { font-size: 40px; margin: 20px; font-weight: bold; }
+.card { margin-bottom: 60px; }
+.green { color: green; }
+.red { color: red; }
 </style>
 </head>
 <body>
-<h1>Monitoring ogłoszeń</h1>
+<h1>Monitoring LAN</h1>
 """
 
-for file in log_files:
-    name = file.replace("log_", "").replace(".csv", "")
-    df = pd.read_csv(file, names=["datetime", "status"])
-    latest_status = df["status"].iloc[-1] if not df.empty else "BRAK DANYCH"
-    color = "green" if latest_status.upper() == "DOSTEPNE" else "red"
+last_update = None
 
-    html_content += f"""
-<div class="card">
-    <div class="status" style="color:{color}">{latest_status}</div>
-    <div>{name}</div>
-</div>
-"""
+for file in glob.glob("log_*.csv"):
+    name = file[4:-4]
+    with open(file, newline="", encoding="utf-8") as f:
+        rows = list(csv.reader(f))
+        if rows:
+            last_row = rows[-1]
+            status = last_row[1]
+            last_update = last_row[0]
+            color = "green" if status=="DOSTEPNE" else "red"
+            html += f'<div class="card"><div class="status {color}">{status}</div><div>{name}</div></div>\n'
 
-html_content += f"""
-<div class="last-update">
-    Ostatnia zmiana statusu: {last_update}
-</div>
-</body>
-</html>
-"""
+html += f"<p>Ostatnia zmiana: {last_update}</p>\n"
+html += "</body></html>"
 
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
+with open("index.html","w",encoding="utf-8") as f:
+    f.write(html)
