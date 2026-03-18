@@ -3,19 +3,35 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Monitoring ogłoszeń</title>
+<title>Monitoring LAN</title>
 <style>
 body { font-family: Arial; text-align: center; margin: 30px; }
 .status { font-size: 40px; margin: 20px; font-weight: bold; }
 .card { margin-bottom: 60px; }
 .green { color: green; }
 .red { color: red; }
+img { border: 1px solid #ccc; border-radius: 8px; }
 </style>
 </head>
 <body>
 <h1>Monitoring LAN</h1>
-<div class="card"><div class="status red">NIEDOSTEPNE</div><div>Router A(500)</div></div>
-<div class="card"><div class="status green">DOSTEPNE</div><div>Router B(300)</div></div>
-<div class="card"><div class="status green">DOSTEPNE</div><div>Router C(300)</div></div>
-<p>Ostatnia zmiana: 2026-03-18 12:31:40</p>
+
+            <div class="card">
+                <div class="status red">NIEDOSTEPNE</div>
+                <div>Router A(500)</div>
+                <img src="chart_Router A(500).png" alt="Router A(500)" style="max-width:600px; margin-top:10px;">
+            </div>
+            
+            <div class="card">
+                <div class="status green">DOSTEPNE</div>
+                <div>Router B(300)</div>
+                <img src="chart_Router B(300).png" alt="Router B(300)" style="max-width:600px; margin-top:10px;">
+            </div>
+            
+            <div class="card">
+                <div class="status green">DOSTEPNE</div>
+                <div>Router C(300)</div>
+                <img src="chart_Router C(300).png" alt="Router C(300)" style="max-width:600px; margin-top:10px;">
+            </div>
+            <p>Ostatnia zmiana: 2026-03-18 12:53:05</p>
 </body></html>
